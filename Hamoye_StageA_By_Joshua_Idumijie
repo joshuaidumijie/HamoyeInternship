@@ -1,0 +1,73 @@
+#Importing all necessary libraries 
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+#Import the the data set
+url = 'https://raw.githubusercontent.com/WalePhenomenon/climate_change/master/fuel_ferc1.csv'
+fuel_data = pd.read_csv(url, error_bad_lines = False)
+# Prior to the Quiz the Data has been cleaned: checked for null values and replaced, checked for duplicates and statistically explored the data.
+# The Headings above explained each step
+
+fuel_data   #Just to visualise the dataset and make it easier to copy the column titles
+
+#confirming we have no null values and duplicates
+fuel_data.isnull().sum()
+#None exists
+
+fuel_data.duplicated().any()
+#none exists
+
+# Question 3
+fuel_data.groupby('fuel_type_code_pudl').fuel_cost_per_unit_burned.mean()  # group by fuel type and the call up the column of fuel cost per unit burned and find the mean
+# Answer is gas 
+
+# Question 4
+fuel_data['fuel_mmbtu_per_unit'].describe()      # The describe function contains the STD and percentile. Specifying the column
+# Answer is std is 10.60 and 75% percentile is  17.01
+
+# Question 5
+fuel_data['fuel_qty_burned'].skew()             # skewness for the required column
+# answer is 15.85
+fuel_data['fuel_qty_burned'].kurtosis()       #kurtosisi for the required column
+#answer is 651.37
+
+#Question 6 has been addressed in the cleaning part of the code.
+fuel_data.shape
+# to calculate the percent 
+(180/29523)*100
+#answer is 0.610 %
+
+#Question 7 : the feature is a string and i will use mode manipulation to fill it as i did in the cleaning of the dataset above.
+
+# To check which has the lowest correlation 
+fuel_data['fuel_cost_per_unit_burned'].corr(fuel_data['utility_id_ferc1'])      #correlation of fuel of cost per unit burned with utility id
+fuel_data['fuel_cost_per_unit_burned'].corr(fuel_data['report_year'])           #correlation of fuel of cost per unit burned with report year
+fuel_data['fuel_cost_per_unit_burned'].corr(fuel_data['fuel_qty_burned'])	       #correlation of fuel of cost per unit burned with fuel qty burned
+fuel_data['fuel_cost_per_unit_burned'].corr(fuel_data['fuel_mmbtu_per_unit'])	    #
+fuel_data['fuel_cost_per_unit_burned'].corr(fuel_data['fuel_cost_per_unit_delivered'])	 
+fuel_data['fuel_cost_per_unit_burned'].corr(fuel_data['fuel_cost_per_mmbtu'])	 
+# Using sort to order a list of the values gave fuel qty burned and fuel mmbtu per unit as the answer
+
+#Question 10
+fuel_data.groupby('report_year').fuel_cost_per_unit_delivered.mean() # group by year and the call up the column of fuel cost per unit delivered and find the mean and check the max
+# 1997 I used max function to confirm
+
+#Question 9
+df1 = fuel_data.iloc[0:,2]      #The Report Year Column
+df2 = fuel_data.iloc[0:,4]      #The Fuel Type Column
+df3 = fuel_data.iloc[0:,6]      # The Fuel Qty Burned
+Df = pd.concat([df1,df2,df3], axis = 1)       #The Combination of all three columns
+print(Df)
+Df_1994 = Df[Df.report_year == 1994]        # For the year 1994
+Df_1998 = Df[Df.report_year == 1998]        # For the year 1998
+Df_1998.groupby('fuel_type_code_pudl').fuel_qty_burned.sum()         #Grouping by fuel type and then summing the fuel burned for each fuel type for 1994
+#The value of interest is  8.982095e+08
+Df_1994.groupby('fuel_type_code_pudl').fuel_qty_burned.sum()        #Grouping by fuel type and then summing the fuel burned for each fuel type for 1994
+#The Value of interest is 7.172082e+08
+a = (((7.172082e+08)-(8.982095e+08))/8.982095e+08) * 100  # using 1998 as original year and 1994 as new year: the formula is (change/initial)*100
+print(a)
+#Answer is -20.15% is -20%
+
+#FOR THE FULL NOTEBOOK KINDLY CHECK THE LINK : https://colab.research.google.com/drive/17pef5ckn5K2UMsjoW90nuRp8WHoH6Hvc?usp=sharing
